@@ -55,6 +55,14 @@ class Store : public torch::CustomClassHolder {
 
   virtual void setTimeout(const std::chrono::milliseconds& timeout);
 
+  virtual void watchKey(
+      const std::string& /* unused */,
+      std::function<void(
+          c10::optional<std::string>,
+          c10::optional<std::string>)> /* unused */) {
+    TORCH_INTERNAL_ASSERT(false, "watchKey only implemented for TCPStore.");
+  }
+
  protected:
   std::chrono::milliseconds timeout_;
 };
