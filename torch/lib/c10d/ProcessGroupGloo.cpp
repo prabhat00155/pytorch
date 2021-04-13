@@ -172,9 +172,20 @@ class GlooStore : public ::gloo::rendezvous::Store {
  public:
   GlooStore(const c10::intrusive_ptr<::c10d::Store>& store) : store_(store) {}
 
+  void set(const std::string& key, const std::vector<uint8_t>& value) {
+    store_->set(key, value);
+  }
+
   void set(const std::string& key, const std::vector<char>& value) override {
     std::vector<uint8_t> tmp(value.begin(), value.end());
     store_->set(key, tmp);
+  }
+
+  // Note: The second argument is just a placeholder because C++ does not allow
+  // overloading when only return types are different
+  std::vector<uint8_t> get(const std::string& key, int /* unused */ = -1) {
+    auto value = store_->get(key);
+    return value;
   }
 
   std::vector<char> get(const std::string& key) override {
@@ -190,6 +201,10 @@ class GlooStore : public ::gloo::rendezvous::Store {
       const std::vector<std::string>& keys,
       const std::chrono::milliseconds& timeout) override {
     store_->wait(keys, timeout);
+  }
+
+  c10::intrusive_ptr<::c10d::Store> getStore() {
+    return store_;
   }
 
  protected:
